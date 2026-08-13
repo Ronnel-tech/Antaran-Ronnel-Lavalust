@@ -14,6 +14,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 <body>
     <h1>Welcome to LavaLust Framework</h1>
     <p>Lightweight. Fast. MVC.</p>
+    <p>This is a test page</p>
 
 
 
