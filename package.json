@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tailwindcss -i ./app/public/assets/css/input.css -o ./app/public/assets/css/output.css",
+    "watch": "tailwindcss -i ./app/public/assets/css/input.css -o ./app/public/assets/css/output.css --watch"
+  }
+}
