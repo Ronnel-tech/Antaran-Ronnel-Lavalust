@@ -16,6 +16,12 @@ COPY . /var/www/html/
 
 # Fix permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+&& chmod -R 755 /var/www/html
+
+# Point Apache document root to public/
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot ${APACHE_DOCUMENT_ROOT}|g' /etc/apache2/sites-available/000-default.conf \
+&& sed -i 's|<Directory /var/www/html>|<Directory ${APACHE_DOCUMENT_ROOT}>|g' /etc/apache2/apache2.conf
 
 EXPOSE 80
