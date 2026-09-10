@@ -44,9 +44,35 @@ defined('PREVENT_DIRECT_ACCESS') or exit('No direct script access allowed');
 */
 /** @var object $router * */
 
-$router->get('/', 'Welcome::index');
+// $router->get('/', 'Welcome::index');
 
-$router->get('/about', 'Welcome::about');
-$router->post('/users/store', 'Users::store');
+// $router->get('/signup', 'AuthController::signup');
+// $router->post('/signup', 'AuthController::register');
+// $router->get('/login', 'AuthController::login');
+// $router->post('/login', 'AuthController::authenticate');
+// $router->get('/logout', 'AuthController::logout');
 
-$router->get('/user/fetch', 'UserController::index');
+// $router->group(['prefix' => '/products', 'middleware' => 'auth'], function ($router) {
+//     $router->get('', 'Products::index');
+//     $router->get('/edit/{id}', 'Products::edit')->where_number('id');
+//     $router->post('/store', 'Products::store');
+//     $router->post('/update/{id}', 'Products::update')->where_number('id');
+//     $router->post('/delete/{id}', 'Products::delete')->where_number('id');
+// });
+
+
+$router->any('/', 'AuthController::login');
+$router->any('/login', 'AuthController::login');
+$router->get('/logout', 'AuthController::logout');
+
+$router->group(['middleware' => 'AuthMiddleware'], function ($router) {
+    $router->get('/product/display', 'ProductController::read');
+    $router->any('/product/create', 'ProductController::create');
+    $router->any('/product/edit/{id}', 'ProductController::edit');
+    $router->get('/product/delete/{id}', 'ProductController::delete');
+
+    $router->get('/products', 'ProductController::read');
+    $router->any('/products/create', 'ProductController::create');
+    $router->any('/products/edit/{id}', 'ProductController::edit');
+    $router->get('/products/delete/{id}', 'ProductController::delete');
+});
