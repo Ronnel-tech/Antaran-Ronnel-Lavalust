@@ -61,8 +61,9 @@ defined('PREVENT_DIRECT_ACCESS') or exit('No direct script access allowed');
 // });
 
 
-$router->any('/', 'AuthController::login');
-$router->any('/login', 'AuthController::login');
+$router->get('/', 'AuthController::login');
+$router->get('/login', 'AuthController::login');
+$router->post('/login', 'AuthController::authenticate');
 $router->get('/logout', 'AuthController::logout');
 
 $router->group(['middleware' => 'AuthMiddleware'], function ($router) {

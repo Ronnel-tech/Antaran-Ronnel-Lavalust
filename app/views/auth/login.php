@@ -134,20 +134,12 @@
         <form action="<?= site_url('/login'); ?>" method="post">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="you@example.com">
+                <input type="email" id="email" name="email" required placeholder="you@example.com" value="<?= htmlspecialchars($email ?? '', ENT_QUOTES, 'UTF-8'); ?>">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required placeholder="••••••••">
-            </div>
-
-            <div class="form-group">
-                <label for="role">Login as</label>
-                <select id="role" name="role" required>
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
             </div>
 
             <button type="submit">Login</button>
