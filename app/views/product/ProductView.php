@@ -217,7 +217,6 @@
                         <th>Product Name</th>
                         <th>Description</th>
                         <th>Price</th>
-                        <th>Created At</th>
                         <?php if ($user_role === 'admin'): ?>
                             <th>Actions</th>
                         <?php endif; ?>
