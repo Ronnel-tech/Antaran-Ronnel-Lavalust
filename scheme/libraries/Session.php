@@ -140,6 +140,14 @@ class Session {
         if ($this->config['sess_driver'] === 'database') {
             $handler = load_class('Database_session_handler', 'libraries/Session');
             session_set_save_handler($handler, true);
+        } elseif (!empty($this->config['sess_save_path'])) {
+            $session_path = $this->config['sess_save_path'];
+
+            if (!is_dir($session_path) || !is_writable($session_path)) {
+                throw new RuntimeException('Session save path is not writable: ' . $session_path);
+            }
+
+            session_save_path($session_path);
         }
 
         // Load security config with safe defaults
