@@ -235,7 +235,7 @@
                             <td><strong><?php echo htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
                             <td><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></td>
                             <td><?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?></td>
-                            <td><?php echo htmlspecialchars($product['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            
                             <?php if ($user_role === 'admin'): ?>
                                 <td>
                                     <a href="<?= site_url('/products/' . $product['id'] . '/edit'); ?>" class="btn btn-action btn-edit">Edit</a>
@@ -265,3 +265,5 @@
 
 </body>
 </html>
+
+
