@@ -1,11 +1,6 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
-/**
- * Controller: ProductController
- * 
- * Automatically generated via CLI.
- */
 class ProductController extends Controller
 {
     public function __construct()
@@ -14,35 +9,35 @@ class ProductController extends Controller
         $this->call->model('ProductModel');
     }
 
-    public function read()
+    public function index()
     {
-        $data['products'] = $this->ProductModel->read();
-        $data['name'] = $this->session->userdata('user_role') ?: 'User';
-        $data['user_role'] = $this->session->userdata('user_role');
-        $data['notification'] = $this->session->flashdata('notification');
-        $this->call->view('product/ProductView', $data);
+        $this->call->view('product/ProductView', [
+            'products' => $this->ProductModel->all(),
+            'user_email' => $this->session->userdata('user_email'),
+            'user_role' => $this->session->userdata('user_role'),
+            'notification' => $this->session->flashdata('notification')
+        ]);
     }
 
     public function create()
     {
         $this->require_admin();
+        $this->render_form('product/create', [], $this->empty_product());
+    }
 
-        if ($this->form_validation->submitted()) {
-            $this->validate_product();
-            if ($this->form_validation->run()) {
-                $product_name = $this->io->post('product_name');
-                $description = $this->io->post('description');
-                $price = $this->io->post('price');
-                $quantity = $this->io->post('quantity');
-                $this->ProductModel->create($product_name, $description, $price, $quantity);
-                $this->session->set_flashdata('notification', 'Product added successfully.');
-                header('Location: ' . site_url('/product/display'));
-                exit;
-            }
+    public function store()
+    {
+        $this->require_admin();
+        [$product, $errors] = $this->product_input();
+
+        if ($errors) {
+            $this->render_form('product/create', $errors, $product);
+            return;
         }
 
-        $data['errors'] = $this->form_validation->get_errors();
-        $this->call->view('product/create', $data);
+        $this->ProductModel->create($product);
+        $this->session->set_flashdata('notification', 'Product added successfully.');
+        $this->redirect('/products');
     }
 
     public function edit($id)
@@ -55,27 +50,29 @@ class ProductController extends Controller
             return;
         }
 
-        if ($this->form_validation->submitted()) {
-            $this->validate_product();
+        $this->render_form('product/edit', [], $product);
+    }
 
-            if ($this->form_validation->run()) {
-                $this->ProductModel->update(
-                    (int) $id,
-                    $this->io->post('product_name'),
-                    $this->io->post('description'),
-                    $this->io->post('price'),
-                    $this->io->post('quantity')
-                );
+    public function update($id)
+    {
+        $this->require_admin();
+        $id = (int) $id;
 
-                $this->session->set_flashdata('notification', 'Product updated successfully.');
-                header('Location: ' . site_url('/product/display'));
-                exit;
-            }
+        if (!$this->ProductModel->find($id)) {
+            show_404();
+            return;
         }
 
-        $data['product'] = $product;
-        $data['errors'] = $this->form_validation->get_errors();
-        $this->call->view('product/edit', $data);
+        [$product, $errors] = $this->product_input();
+        if ($errors) {
+            $product['id'] = $id;
+            $this->render_form('product/edit', $errors, $product);
+            return;
+        }
+
+        $this->ProductModel->update($id, $product);
+        $this->session->set_flashdata('notification', 'Product updated successfully.');
+        $this->redirect('/products');
     }
 
     public function delete($id)
@@ -83,20 +80,51 @@ class ProductController extends Controller
         $this->require_admin();
         $this->ProductModel->delete((int) $id);
         $this->session->set_flashdata('notification', 'Product deleted successfully.');
-        header('Location: ' . site_url('/product/display'));
-        exit;
+        $this->redirect('/products');
     }
 
-    private function validate_product()
+    private function product_input(): array
     {
-        $this->form_validation
-            ->name('product_name')->required()->alpha_numeric_space()
-            ->name('description')->required()->max_length(255)
-            ->name('price')->required()->numeric()
-            ->name('quantity')->required()->numeric();
+        $product = [
+            'product_name' => trim((string) $this->io->post('product_name')),
+            'description' => trim((string) $this->io->post('description')),
+            'price' => trim((string) $this->io->post('price')),
+            'quantity' => trim((string) $this->io->post('quantity'))
+        ];
+        $errors = [];
+
+        if ($product['product_name'] === '' || strlen($product['product_name']) > 100) {
+            $errors[] = 'Product name is required and must be 100 characters or fewer.';
+        }
+        if ($product['description'] === '') {
+            $errors[] = 'Description is required.';
+        }
+        if (!is_numeric($product['price']) || (float) $product['price'] < 0) {
+            $errors[] = 'Price must be a non-negative number.';
+        }
+        if (filter_var($product['quantity'], FILTER_VALIDATE_INT) === false || (int) $product['quantity'] < 0) {
+            $errors[] = 'Quantity must be a non-negative whole number.';
+        }
+
+        if (!$errors) {
+            $product['price'] = number_format((float) $product['price'], 2, '.', '');
+            $product['quantity'] = (int) $product['quantity'];
+        }
+
+        return [$product, $errors];
     }
 
-    private function require_admin()
+    private function empty_product(): array
+    {
+        return ['product_name' => '', 'description' => '', 'price' => '', 'quantity' => ''];
+    }
+
+    private function render_form(string $view, array $errors, array $product): void
+    {
+        $this->call->view($view, ['errors' => $errors, 'product' => $product]);
+    }
+
+    private function require_admin(): void
     {
         if ($this->session->userdata('user_role') !== 'admin') {
             show_error('403 Forbidden', 'Administrator access is required for this action.', 'error_general', 403);
@@ -104,4 +132,9 @@ class ProductController extends Controller
         }
     }
 
+    private function redirect(string $path): void
+    {
+        header('Location: ' . site_url($path));
+        exit;
+    }
 }

@@ -85,6 +85,11 @@
             color: #2d3748;
         }
 
+        .logout-form,
+        .delete-form {
+            display: inline;
+        }
+
         .btn-action {
             padding: 0.25rem 0.6rem;
             font-size: 0.8rem;
@@ -141,6 +146,12 @@
             background-color: #f8fafc;
         }
 
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: #718096;
+        }
+
         /* Toast Notification Styling */
         .notification {
             position: fixed;
@@ -186,12 +197,15 @@
         <?php endif; ?>
 
         <div class="header">
-            <h4>Welcome, <?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?></h4>
+            <h4>Products</h4>
             <div class="nav-actions">
                 <?php if ($user_role === 'admin'): ?>
-                    <a href="<?= site_url('/product/create'); ?>" class="btn btn-primary">Add Product</a>
+                    <a href="<?= site_url('/products/create'); ?>" class="btn btn-primary">Add Product</a>
                 <?php endif; ?>
-                <a href="<?= site_url('/logout'); ?>" class="btn btn-logout">Logout</a>
+                <span><?= htmlspecialchars($user_email, ENT_QUOTES, 'UTF-8'); ?></span>
+                <form class="logout-form" action="<?= site_url('/logout'); ?>" method="post">
+                    <button type="submit" class="btn btn-logout">Logout</button>
+                </form>
             </div>
         </div>
 
@@ -210,6 +224,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <?php if (empty($products)): ?>
+                        <tr>
+                            <td class="empty-state" colspan="<?= $user_role === 'admin' ? 6 : 5; ?>">No products are available yet.</td>
+                        </tr>
+                    <?php else: ?>
                     <?php foreach ($products as $product): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($product['id'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -219,12 +238,15 @@
                             <td><?php echo htmlspecialchars($product['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
                             <?php if ($user_role === 'admin'): ?>
                                 <td>
-                                    <a href="<?= site_url('/product/edit/' . $product['id']); ?>" class="btn btn-action btn-edit">Edit</a>
-                                    <a href="<?= site_url('/product/delete/' . $product['id']); ?>" class="btn btn-action btn-delete" onclick="return confirm('Delete this product?');">Delete</a>
+                                    <a href="<?= site_url('/products/' . $product['id'] . '/edit'); ?>" class="btn btn-action btn-edit">Edit</a>
+                                    <form class="delete-form" action="<?= site_url('/products/' . $product['id'] . '/delete'); ?>" method="post" onsubmit="return confirm('Delete this product?');">
+                                        <button type="submit" class="btn btn-action btn-delete">Delete</button>
+                                    </form>
                                 </td>
                             <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

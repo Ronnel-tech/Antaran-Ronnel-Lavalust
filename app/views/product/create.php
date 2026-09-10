@@ -121,31 +121,39 @@
     <div class="container">
         <h2>Add Product</h2>
 
-        <form action="<?= site_url('/product/create'); ?>" method="post">
+        <?php if (!empty($errors)): ?>
+            <ul class="error-list">
+                <?php foreach ($errors as $error): ?>
+                    <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form action="<?= site_url('/products'); ?>" method="post">
             <div class="form-group">
                 <label for="product_name">Product Name</label>
-                <input type="text" class="form-control" id="product_name" name="product_name" placeholder="e.g. Wireless Mouse" required>
+                <input type="text" class="form-control" id="product_name" name="product_name" placeholder="e.g. Wireless Mouse" value="<?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8'); ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea class="form-control" id="description" name="description" placeholder="Enter product details..."></textarea>
+                <textarea class="form-control" id="description" name="description" placeholder="Enter product details..." required><?= htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></textarea>
             </div>
 
             <div class="form-group">
                 <label for="price">Price</label>
-                <input type="number" class="form-control" id="price" name="price" step="0.01" placeholder="0.00" required>
+                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" placeholder="0.00" value="<?= htmlspecialchars((string) $product['price'], ENT_QUOTES, 'UTF-8'); ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="quantity">Quantity</label>
-                <input type="number" class="form-control" id="quantity" name="quantity" placeholder="0" required>
+                <input type="number" class="form-control" id="quantity" name="quantity" min="0" step="1" placeholder="0" value="<?= htmlspecialchars((string) $product['quantity'], ENT_QUOTES, 'UTF-8'); ?>" required>
             </div>
 
             <button type="submit" class="btn-primary">Add Product</button>
         </form>
 
-        <a href="<?= site_url('/product/display'); ?>" class="back-link">&larr; Back to products</a>
+        <a href="<?= site_url('/products'); ?>" class="back-link">&larr; Back to products</a>
     </div>
 
 </body>

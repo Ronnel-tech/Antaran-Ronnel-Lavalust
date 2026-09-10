@@ -1,53 +1,41 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
-/**
- * Model: ProductModel
- * 
- * Automatically generated via CLI.
- */
-class ProductModel extends Model {
-    protected $table = '';
+class ProductModel extends Model
+{
+    protected $table = 'products';
     protected $primary_key = 'id';
-    protected $fillable = [];
-    protected $guarded = ['id'];
 
-    public function __construct()
+    public function all(): array
     {
-        parent::__construct();
+        return $this->db->table($this->table)->get_all() ?: [];
     }
 
-    public function read(){
-        return $this->db->table('products')->get_all();
+    public function find(int $id): ?array
+    {
+        $product = $this->db->table($this->table)
+            ->where($this->primary_key, $id)
+            ->get();
+
+        return $product ?: null;
     }
 
-    public function find($id){
-        return $this->db->table('products')->where('id', $id)->get();
+    public function create(array $product)
+    {
+        return $this->db->table($this->table)->insert($product);
     }
 
-    public function create($product_name, $description, $price, $quantity){
-        $data = array(
-            'product_name' => $product_name,
-            'description' => $description,
-            'price' => $price,
-            'quantity' => $quantity
-        );
-
-        $this->db->table('products')->insert($data);
+    public function update(int $id, array $product)
+    {
+        return $this->db->table($this->table)
+            ->where($this->primary_key, $id)
+            ->update($product);
     }
 
-    public function update($id, $product_name, $description, $price, $quantity){
-        $data = array(
-            'product_name' => $product_name,
-            'description' => $description,
-            'price' => $price,
-            'quantity' => $quantity
-        );
-
-        return $this->db->table('products')->where('id', $id)->update($data);
-    }
-
-    public function delete($id){
-        return $this->db->table('products')->where('id', $id)->delete();
+    public function delete(int $id)
+    {
+        return $this->db->table($this->table)
+            ->where($this->primary_key, $id)
+            ->delete();
     }
 }
