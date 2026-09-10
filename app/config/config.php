@@ -79,7 +79,7 @@ $config['environment'] = getenv('APP_ENV') ?: 'development';
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= 'http://localhost:3000/';
+$config['base_url'] 				= getenv('APP_URL') ?: 'http://localhost:3000/';
 
 /*
 |--------------------------------------------------------------------------
@@ -263,7 +263,10 @@ $config['session_hmac_secret']     = getenv('APP_KEY') ?: '';
 $config['cookie_prefix']           = '';
 $config['cookie_domain']           = '';
 $config['cookie_path']             = '/';
-$config['cookie_secure']           = FALSE;
+$config['cookie_secure']           = filter_var(
+    getenv('COOKIE_SECURE') ?: ($config['environment'] === 'production'),
+    FILTER_VALIDATE_BOOLEAN
+);
 $config['cookie_expiration']       = 86400;
 $config['cookie_httponly']         = FALSE;
 $config['cookie_samesite']         = 'Strict';
